@@ -618,7 +618,7 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            menuCreator.set_Force_Livedata(nodeDataBase[nodeNum].nodeNumber,
+            menuCreator.set_Force_Livedata(0,
                                            nodeDataBase[nodeNum].mDecWeigthMeasure,
                                            nodeDataBase[nodeNum].vDecBattery,
                                            0,
@@ -640,7 +640,7 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            menuCreator.set_Force_Livedata(nodeDataBase[nodeNum].nodeNumber,
+            menuCreator.set_Force_Livedata(1,
                                            nodeDataBase[nodeNum].mDecWeigthMeasureStand1,
                                            nodeDataBase[nodeNum].vDecBattery,
                                            0,
@@ -662,7 +662,7 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            menuCreator.set_Force_Livedata(nodeDataBase[nodeNum].nodeNumber,
+            menuCreator.set_Force_Livedata(2,
                                            nodeDataBase[nodeNum].mDecWeigthMeasureStand2,
                                            nodeDataBase[nodeNum].vDecBattery,
                                            0,
@@ -684,7 +684,7 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            menuCreator.set_Force_Livedata(nodeDataBase[nodeNum].nodeNumber,
+            menuCreator.set_Force_Livedata(nodeNum-6,
                                            nodeDataBase[nodeNum].mDecWeigthMeasure,
                                            nodeDataBase[nodeNum].vDecBattery,
                                            0,
@@ -706,7 +706,7 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            set_BT_Livedata(BT_ID_number,
+            set_BT_Livedata(nodeNum-12,
                             nodeDataBase[nodeNum].mAccelX,
                             nodeDataBase[nodeNum].mAccelY,
                             nodeDataBase[nodeNum].mAccelZ,

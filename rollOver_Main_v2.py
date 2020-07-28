@@ -1357,7 +1357,6 @@ def cls():
         print('\n')
         u += 1
 
-
 # def uploadDataBase(self):
 # read out all data from HW for all nodes in the system
 
@@ -1439,7 +1438,8 @@ print('--- Start reading data ---' + str(Exit) + "," + str(haltThreadFlag))
 ### NEW GUI IMPLEMENTATION
 
 def main(stdscr):
-    menuCreator.main_GUI_START(stdscr)
+    menuCreator.main_GUI_START(stdscr,SPIRec)
+
     # choice = input_box_center(stdscr, 'Log name:')
 
 

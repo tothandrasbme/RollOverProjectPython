@@ -16,6 +16,9 @@ import time
 ### Jelenleg a szimulalt eredmenyeket a kovetkezo fuggvenyben generalom:
 # get_live_data()
 
+global spiObject
+
+
 # Variables:
 class menuCreatorObject:
     def initial_variables(self):
@@ -1083,6 +1086,7 @@ class menuCreatorObject:
         global item_Force_calibratins  # Calibration datas
         global item_Force_type_name_ID  # Type IDs of Force Node
         global Log_current_status
+        global spiObject
 
         # Screen refreshing time / or waiting time for pressing key:
         stdscr.nodelay(1)
@@ -1209,7 +1213,10 @@ class menuCreatorObject:
                     self.set_start_log(2)
                     # break
 
-            self.get_live_data()
+            ##self.get_live_data()
+
+            spiObject.sendReadAllPackage()
+
             scr_change = True
 
             if scr_change:
@@ -1510,9 +1517,12 @@ class menuCreatorObject:
         return anws_choosed
 
 
-    def main_GUI_START(self,stdscr):
+    def main_GUI_START(self,stdscr,sensor_object):
         global main_menu
+        global spiObject
         self.initial_variables()
+
+        spiObject = sensor_object
 
         # turn off cursor blinking
         curses.curs_set(0)

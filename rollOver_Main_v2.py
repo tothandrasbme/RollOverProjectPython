@@ -594,8 +594,8 @@ class SPIReceiver:
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
             menuCreator.set_IR_Livedata(nodeDataBase[nodeNum].nodeNumber,
-                                        nodeDataBase[nodeNum].mDecLDValue,
                                         0,
+                                        nodeDataBase[nodeNum].mDecLDValue,
                                         0,
                                         nodeDataBase[nodeNum].vBattery,
                                         0,

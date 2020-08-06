@@ -269,7 +269,7 @@ void loop(void)
     ble.println(temp.temperature, 2);
     ble.print("]");*/
 
-    ble.print("AT+BLEUARTTX=[" +
+    /*ble.println("AT+BLEUARTTX=[" +
         String(gyro.gyro.x) + "," +
         String(gyro.gyro.y) + "," +
         String(gyro.gyro.z) + "," +
@@ -279,28 +279,38 @@ void loop(void)
         String(mag.magnetic.x) + "," +
         String(mag.magnetic.y) + "," +
         String(mag.magnetic.z) + "," +
-        String(temp.temperature) + "]");
+        String(temp.temperature) + "]");*/
+
+     ble.println("AT+BLEUARTTXF=[" +
+        String(accel.acceleration.x) + "," +
+        String(accel.acceleration.y) + "," +
+        String(accel.acceleration.z) + "]");
+
+    Serial.println("AT+BLEUARTTXF=[" +
+        String(accel.acceleration.x) + "," +
+        String(accel.acceleration.y) + "," +
+        String(accel.acceleration.z) + "]");
 
     if (! ble.waitForOK() )
     {
-      Serial.println(F("Failed to send?"));
+      Serial.println(F("Failed to send1?"));
     }
 
     if (! ble.waitForOK() )
     {
-      Serial.println(F("Failed to send?"));
+      Serial.println(F("Failed to send2?"));
     }
 
-    /*
+
     // Display the buffer size (firmware 0.6.7 and higher only!)
-    ble.println("AT+BLEUARTFIFO=TX");
+    /*ble.println("AT+BLEUARTFIFO=TX");
     ble.readline();
     Serial.print("TX FIFO: ");
-    Serial.println(ble.buffer);
-    */
+    Serial.println(ble.buffer);*/
+
 
     // Wait a bit ...
-    delay(200);
+    delay(50);
   }
 
   // Check for incoming characters from Bluefruit

@@ -32,6 +32,10 @@ import json
 
 import subprocess as sp
 
+# Adafruit Flora
+import Adafruit_BluefruitLE
+from Adafruit_BluefruitLE.services import UART
+
 # Prepare global variables
 global transportData1
 global transportData2
@@ -81,6 +85,8 @@ global accelY
 global accelZ
 
 global menuCreator
+
+global ble
 
 idCollector = 11
 idPacket = 1
@@ -245,6 +251,112 @@ class BluetoothServer:
                 server_sock.close()
                 bluetoothConnected = False
 
+class AdafruitBLEServer:
+    def __init__(self):
+        global ble
+        ble = Adafruit_BluefruitLE.get_provider()
+
+        self._running = True
+
+    def terminate(self):
+        self._running = False
+
+    def run(self):
+        global ble
+        global haltThreadFlag
+
+        # Initialize the BLE system.  MUST be called before other BLE calls!
+        ble.initialize()
+
+        # Clear any cached data because both bluez and CoreBluetooth have issues with
+        # caching data and it going stale.
+        ble.clear_cached_data()
+
+        # Get the first available BLE network adapter and make sure it's powered on.
+        adapter = ble.get_default_adapter()
+        adapter.power_on()
+        print('Using adapter: {0}'.format(adapter.name))
+
+        # Disconnect any currently connected UART devices.  Good for cleaning up and
+        # starting from a fresh state.
+        print('Disconnecting any connected UART devices...')
+        UART.disconnect_devices()
+
+        # Scan for UART devices.
+        print('Searching for UART device...')
+        try:
+            adapter.start_scan()
+            # Search for the first UART device found (will time out after 60 seconds
+            # but you can specify an optional timeout_sec parameter to change it).
+            device = UART.find_device()
+            if device is None:
+                raise RuntimeError('Failed to find UART device!')
+        finally:
+            # Make sure scanning is stopped before exiting.
+            adapter.stop_scan()
+
+        print('Connecting to device...')
+        device.connect()  # Will time out after 60 seconds, specify timeout_sec parameter
+        # to change the timeout.
+
+        # Once connected do everything else in a try/finally to make sure the device
+        # is disconnected when done.
+        try:
+            # Wait for service discovery to complete for the UART service.  Will
+            # time out after 60 seconds (specify timeout_sec parameter to override).
+            print('Discovering services...')
+            UART.discover(device)
+
+            # Once service discovery is complete create an instance of the service
+            # and start interacting with it.
+            uart = UART(device)
+
+            while not haltThreadFlag:
+                # Now wait up to one minute to receive data from the device.
+                # print('Waiting up to 60 seconds to receive data from the device...')
+                received = uart.read()
+
+                received = "[3,-1.90,-0.28,-9.63]"
+
+                nodeIdNumber = 0
+                accX = 0.0
+                accY = 0.0
+                accZ = 0.0
+
+                if received is not None:
+                    # Received data, print it ou
+                    print(received)
+                    # Parse the data -- [3,-1.90,-0.28,-9.63]
+                    paramsList = str(received)
+                    params = paramsList.split(',')
+                    nodeIdNumber = int(params[0][1:])
+                    accX = float(params[1])
+                    accY = float(params[2])
+                    if params[3][len(params[3])-1] == ']':
+                        accZ = float(params[3][:len(params[3])-1])
+                    else:
+                        accZ = float(params[3])
+                    print("num: " + str(nodeIdNumber) + " accX: " + str(accX) + " accY: " + str(accY) + " accZ: " + str(accZ))
+                    #Set live Bluetooth Data
+                    menuCreator.set_BT_Livedata(nodeIdNumber,
+                                    accX,
+                                    accY,
+                                    accZ,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    100,
+                                    25)
+                else:
+                    # Timeout waiting for data, None is returned.
+                    print('Received no data!')
+        finally:
+            # Make sure device is disconnected on exit.
+            device.disconnect()
 
 class GPSUARTConnection:
     def __init__(self):
@@ -706,19 +818,19 @@ class SPIReceiver:
 
             #pprint(vars(nodeDataBase[nodeNum]))  # Comment this if the reading is too slow
 
-            menuCreator.set_BT_Livedata(nodeNum-12,
-                            nodeDataBase[nodeNum].mAccelX,
-                            nodeDataBase[nodeNum].mAccelY,
-                            nodeDataBase[nodeNum].mAccelZ,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            nodeDataBase[nodeNum].vDecBattery,
-                            0,
-                            nodeDataBase[nodeNum].tempDevice)
+            #menuCreator.set_BT_Livedata(nodeNum-12,
+            #                nodeDataBase[nodeNum].mAccelX,
+            #                nodeDataBase[nodeNum].mAccelY,
+            #                nodeDataBase[nodeNum].mAccelZ,
+            #                0,
+            #                0,
+            #                0,
+            #                0,
+            #                0,
+            #                0,
+            #                nodeDataBase[nodeNum].vDecBattery,
+            #                0,
+            #                nodeDataBase[nodeNum].tempDevice)
 
             nodeNum += 1
 
@@ -1375,6 +1487,14 @@ recSettings = CommandSettings()
 ##TEST##BTserverThread = Thread(target=BTserver.run)
 # Start Thread
 ##TEST##BTserverThread.start()
+
+
+# Create Class
+BTserver = AdafruitBLEServer()
+# Create Thread
+BTserverThread = Thread(target=BTserver.run)
+# Start Thread
+BTserverThread.start()
 
 # Create Class
 ##TEST##GPSConnection = GPSUARTConnection()
